@@ -38,8 +38,8 @@ Retell handles the live speech pipeline. Callzie owns the scheduling rules, book
 Use a current Node.js LTS release compatible with Next.js 16, npm, and PostgreSQL with the `btree_gist` extension available. Python 3 is needed for the privacy checks.
 
 ```sh
-git clone https://github.com/anushapundir/callzie-open-source.git
-cd callzie-open-source
+git clone https://github.com/anushapundir/callzie-voice.git
+cd callzie-voice
 npm ci
 cp .env.example .env.local
 ```
