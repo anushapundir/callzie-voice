@@ -1,0 +1,7 @@
+Agent: Hi, is this Priya? This is Maya calling from Tool Test Salon about your haircut.
+User: Yes, speaking.
+Agent: Lovely. I'm just calling to confirm your appointment on Thursday the twentieth of August at 2:30 PM. Does that still work for you?
+User: Yes, that's fine. Thursday at half two.
+Agent: Wonderful, you're all confirmed. See you Thursday.
+User: Thanks. Oh — could you send me a text the day before? I forget these things.
+Agent: Of course, I'll make a note of that. Have a good day.

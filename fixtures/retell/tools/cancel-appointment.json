@@ -1,0 +1,11 @@
+{
+  "name": "cancel_appointment",
+  "call": {
+    "call_id": "CALL_ID_PLACEHOLDER",
+    "agent_id": "agent_fixture",
+    "call_type": "web_call",
+    "call_status": "ongoing",
+    "transcript": "Agent: Would another time suit you better?\nUser: No, please just cancel it."
+  },
+  "args": {}
+}

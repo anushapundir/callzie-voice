@@ -1,0 +1,11 @@
+{
+  "event": "call_inbound",
+  "event_timestamp": 1780012672105,
+  "call_inbound": {
+    "agent_id": "agent_configured_on_the_number",
+    "agent_version": 1,
+    "from_number": "FROM_NUMBER_PLACEHOLDER",
+    "to_number": "TO_NUMBER_PLACEHOLDER",
+    "custom_sip_headers": {}
+  }
+}

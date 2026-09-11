@@ -1,0 +1,98 @@
+# Optional deployment for a separately configured self-hosted installation.
+#
+# This runs the same two commands a person runs by hand — see
+# docs/runbooks/deploying.md — and nothing else. It does not run tests and it
+# does not run database migrations; both are deliberate, and the runbook says
+# why and what to do instead.
+#
+# GitHub proves who it is to Google with a short-lived token (Workload Identity
+# Federation), so there is no service-account key stored in this repo or in
+# GitHub. scripts/setup-github-deploy.sh creates everything this file needs on
+# the Google side and fills in the three repository variables it reads.
+
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+# Two pushes in quick succession deploy one after the other, never side by
+# side. cancel-in-progress stays false: a deploy that has started should finish,
+# so the service never sits on a half-applied one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  # Needed to mint the token Google checks. Nothing else in the repo is written.
+  id-token: write
+
+env:
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE: callzie
+  # The Artifact Registry repository, created by scripts/setup-infrastructure.sh.
+  REPO: callzie
+
+jobs:
+  deploy:
+    if: ${{ vars.ENABLE_DEPLOYMENT == 'true' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refuse to run with the variables unset
+        # A missing variable would otherwise surface as a confusing auth error,
+        # or as an image built with an empty Clerk key that fails at sign-in.
+        env:
+          WIP: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          SA: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+          PK: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+        run: |
+          for v in PROJECT_ID WIP SA PK; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Repository variable for $v is empty. Run scripts/setup-github-deploy.sh."
+              exit 1
+            fi
+          done
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build the image with Cloud Build
+        # Tagged with the commit SHA, so every image says exactly which commit
+        # it is, and rolling back is deploying an older tag.
+        run: |
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${SERVICE}:${GITHUB_SHA}"
+          echo "IMAGE=${IMAGE}" >> "$GITHUB_ENV"
+          gcloud builds submit \
+            --project="${PROJECT_ID}" \
+            --config=cloudbuild.yaml \
+            --substitutions="_IMAGE=${IMAGE},_CLERK_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}"
+
+      - name: Deploy to Cloud Run
+        # Only the image changes. Secrets, env vars, the service account, the
+        # Cloud SQL connection and the CPU setting all carry over from the
+        # revision that is already running.
+        run: |
+          gcloud run deploy "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --platform=managed \
+            --image="${IMAGE}" \
+            --quiet
+
+      - name: Check the new revision answers
+        run: |
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" --region="${REGION}" --format='value(status.url)')
+          code=$(curl -s -o /dev/null -w '%{http_code}' "${URL}/")
+          echo "${URL}/ answered HTTP ${code}"
+          [ "${code}" = "200" ]

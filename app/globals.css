@@ -1,0 +1,523 @@
+/*
+  `source(none)` turns off Tailwind's automatic content detection, which would
+  otherwise scan every file in the repo — including SPEC.md and docs/ — and mint
+  utilities out of prose. Scanning only the app's own source keeps the token
+  audit meaningful.
+*/
+@import "tailwindcss" source(none);
+@source "../app";
+@source "../components";
+@source "../lib";
+
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+  The design system — "Broadsheet" (docs/design.md).
+
+  Warm paper, warm ink, hairline rules instead of boxes, numbers set like a
+  financial report, and exactly one colour, which only ever means "a call is
+  live right now". The token *names* survive from the original system so the
+  whole app re-themes at this one file; only the values changed.
+
+  Tailwind 4 is CSS-first, so this file *is* the token config. The three
+  `*: initial` resets below delete Tailwind's stock palette, type scale and
+  radius scale, so the only colours, font sizes and radii the framework can
+  generate are the ones named here. That makes "no font size, colour or radius
+  outside the token set" a build-time property rather than a review promise —
+  `bg-blue-500`, `text-lg` and `rounded-xl` simply do not exist in this app.
+
+  One system, two grounds. Light is the default. Anything inside
+  `[data-ground="dark"]` — the landing's hero band, its product band, its
+  footer, the sign-in brand half — redefines these same token names at the
+  bottom of this file, so a component written once works on either ground.
+*/
+@theme {
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+
+  /* Spacing: 4px grid. */
+  --spacing: 4px;
+
+  /* --- Palette ---------------------------------------------------------- */
+  /* Paper. The page floor, and the only ground — cards do not get a different
+     white, because cards are mostly gone. */
+  --color-bg: #fafaf7;
+  --color-surface: #fafaf7;
+  /* Row hover, outside-hours bands, the sign-in brand half. */
+  --color-surface-soft: #f4f3ef;
+  /* Active nav fill, pressed states, code blocks. */
+  --color-surface-card: #ecebe6;
+  /* The 1px hairline that separates rows. */
+  --color-line: #e2e0da;
+  /* The one heavier rule: under a section title, above every table. */
+  --color-line-strong: #c9c6be;
+  /* Ink. Body text and primary actions are the same colour. */
+  --color-text: #141311;
+  --color-text-muted: #6f6c64;
+  --color-accent: #141311;
+  --color-accent-active: #2a2824;
+  /*
+    The one vivid colour: cobalt, and it means exactly one thing. It may appear
+    on the pulsing dot, the in-progress status dot, the row shimmer, the
+    recording playhead and the live favicon. Nowhere else — not on links, not
+    on buttons, not on focus rings, not on icons. Grep for `-live` in review.
+  */
+  --color-live: #2445e0;
+
+  /* --- Status colours --------------------------------------------------- */
+  /* Dark enough to hold 4.5:1 as text on paper, not just as dots. */
+  --color-confirmed: #1f6b45;
+  --color-rescheduled: #9a5b00;
+  --color-declined: #b42318;
+  /* Unreachable is grey on purpose: it is an absence, not an outcome. */
+  --color-unreachable: #6f6c64;
+  --color-attention: #b4530a;
+  /* In-progress deliberately has no token of its own — it uses `live`. */
+
+  /* --- CSS keywords ----------------------------------------------------- */
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-inherit: inherit;
+
+  /*
+    shadcn/ui's semantic names, aliased onto the palette above. These exist so
+    the components in components/ui keep working; they introduce no new colour.
+    Note shadcn's `--accent` (a hover wash) is deliberately absent — our accent
+    is the ink primary, and the two must not be confused. Use `muted` for
+    hover fills.
+  */
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-text);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: var(--color-bg);
+  --color-secondary: var(--color-surface-card);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-surface-card);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-destructive: var(--color-declined);
+  --color-destructive-foreground: var(--color-bg);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line);
+  --color-ring: var(--color-accent);
+
+  /* --- Type ------------------------------------------------------------- */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-heading: var(--font-inter);
+  /*
+    Instrument Serif, loaded by the root layout. The display voice, rationed:
+    in the app it appears on the topbar title and the Call-detail verdict and
+    nowhere else; on the landing it carries the headline, the masthead figures
+    and the footer wordmark.
+  */
+  --font-serif: var(--font-instrument-serif, Georgia, serif);
+  /*
+    Outfit: the wordmark, and every heading on the landing page. Geometric with
+    round bowls, which is what makes the marketing page read as soft. It is not
+    used inside the app, where the serif carries the page titles.
+  */
+  --font-display: var(--font-outfit, ui-sans-serif, system-ui, sans-serif);
+
+  --text-table: 13px;
+  --text-table--line-height: 18px;
+  --text-body: 14px;
+  --text-body--line-height: 20px;
+  /*
+    Weight lives in the token, not next to it. Before this, `--text-section`
+    and `--text-page` carried no weight, so the same heading shipped at 500 in
+    one file and 600 in the next. Do not write `font-medium` or `font-semibold`
+    beside `text-section` or `text-page`.
+  */
+  --text-section: 16px;
+  --text-section--line-height: 24px;
+  --text-section--letter-spacing: -0.01em;
+  --text-section--font-weight: 500;
+  --text-page: 22px;
+  --text-page--line-height: 28px;
+  --text-page--letter-spacing: -0.02em;
+  --text-page--font-weight: 600;
+  /*
+    The one large size in the app (SPEC §11.2). It carries the page title in
+    Instrument Serif, the Call-detail verdict, and the Overview figures in
+    Inter 500 tabular. Without it the page title, the stat digits and the call
+    header were all 22px and nothing read first.
+  */
+  --text-title: 32px;
+  --text-title--line-height: 36px;
+  --text-title--letter-spacing: -0.01em;
+  /*
+    The landing page's two marketing sizes, set in the serif. `clamp()` scales
+    the headline with the viewport so the hero never overflows a phone — the
+    app screens stay on the fixed scale above.
+  */
+  --text-display: clamp(38px, 5.2vw, 64px);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 700;
+  --text-display-sm: clamp(28px, 3.2vw, 40px);
+  --text-display-sm--line-height: 1.15;
+  --text-display-sm--letter-spacing: -0.025em;
+  --text-display-sm--font-weight: 700;
+  --text-lead: clamp(16px, 1.4vw, 19px);
+  --text-lead--line-height: 1.5;
+
+  /* --- Shape: separation comes from 1px rules, never elevation ----------- */
+  --radius-card: 6px;
+  --radius-control: 4px;
+  /*
+    Declared so the token set covers every radius the app uses. `rounded-full`
+    is a static Tailwind utility that survives the `--radius-*: initial` reset,
+    so naming it here is the difference between a token and an escape hatch.
+    For circles and pills only — the pulsing dot, the meter bar, the avatar.
+  */
+  --radius-full: calc(infinity * 1px);
+  /*
+    Two softer radii, for the landing page only. The app is a working surface
+    and stays at 6/4; a marketing page is a poster, and a 20px corner is most of
+    what makes a card look friendly rather than filed.
+  */
+  --radius-soft: 20px;
+  --radius-chip: 12px;
+
+  /* --- Elevation --------------------------------------------------------- */
+  /*
+    Objects separate with a 1px rule, never a shadow. The one exception is a
+    surface that floats over the page — popovers, tooltips, drawers — which
+    gets this single soft shadow so it reads as above the content it covers.
+  */
+  --shadow-overlay: 0 4px 12px rgb(0 0 0 / 0.08);
+  /*
+    And two soft ones, also landing-only. The app separates with a 1px rule; a
+    poster can afford to let the product sheet lift off the page. Both are a
+    hairline plus a wide, very light spread — the shadow you notice only when it
+    is missing.
+  */
+  --shadow-soft: 0 1px 2px rgb(18 19 26 / 0.04), 0 18px 40px -12px rgb(18 19 26 / 0.12);
+  --shadow-chip: 0 1px 2px rgb(18 19 26 / 0.06), 0 8px 20px -6px rgb(18 19 26 / 0.16);
+
+  /* --- Motion ----------------------------------------------------------- */
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: ease;
+
+  /* The one signature animation: the live indicator's pulsing dot. */
+  --animate-live-pulse: live-pulse 2s ease-in-out infinite;
+
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.85);
+    }
+  }
+
+  /*
+    Its companion: the row of the Appointment being called.
+
+    A background wash rather than a moving highlight, because this lands on a
+    table row that must stay readable while it animates — a sweeping gradient
+    across text is the thing that makes a row harder to read exactly when
+    someone is watching it. `live` is legitimate here: it is the same signal
+    the pulsing dot carries, landed on the table.
+  */
+  --animate-row-shimmer: row-shimmer 2s ease-in-out infinite;
+
+  @keyframes row-shimmer {
+    0%,
+    100% {
+      background-color: color-mix(in oklab, var(--color-live) 6%, transparent);
+    }
+    50% {
+      background-color: color-mix(in oklab, var(--color-live) 14%, transparent);
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+
+  html {
+    color-scheme: light;
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-bg text-body text-text antialiased;
+    /*
+      Every figure in the product sits in a column that has to line up — the
+      stat strip, the quota meter, the table's times, the tool latencies. Lining
+      up is the default, not a per-component decision.
+    */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+    Quality floor: one rule gives every interactive element a visible ink
+    outline at 2px offset, so no component can forget it. An outline rather
+    than a box-shadow: it is the only thing that survives an
+    `overflow: hidden` ancestor and follows non-rectangular shapes.
+
+    Nothing may re-add `outline-none` or `outline-hidden` on a focusable
+    element. That is what silently deleted the ring on every text input.
+  */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Phone numbers, timestamps, durations, Slot times and JSON. */
+  code,
+  kbd,
+  samp,
+  pre {
+    @apply font-mono;
+  }
+
+  /*
+    iOS zooms the whole page in whenever a focused field is under 16px, and
+    then leaves it zoomed. Fields are 14px by design, so bump them to 16 on
+    touch devices only — a pointer that cannot hover is a finger.
+  */
+  @media (hover: none) and (pointer: coarse) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+}
+
+/*
+  The two grounds. Same token names, different values, scoped to a subtree —
+  so `bg-surface`, `text-text-muted` and `border-line` keep working inside the
+  landing's ink bands without a single private colour.
+
+  `light` exists so a paper object can sit *inside* an ink band without undoing
+  the dark values one utility at a time. That is exactly what the landing's
+  product frame is: a picture of the app, which is paper, held on an ink page.
+*/
+[data-ground="light"] {
+  color-scheme: light;
+
+  --color-bg: #fafaf7;
+  --color-surface: #fafaf7;
+  --color-surface-soft: #f4f3ef;
+  --color-surface-card: #ecebe6;
+  --color-line: #e2e0da;
+  --color-line-strong: #c9c6be;
+  --color-text: #141311;
+  --color-text-muted: #6f6c64;
+  --color-accent: #141311;
+  --color-accent-active: #2a2824;
+  --color-live: #2445e0;
+
+  --color-confirmed: #1f6b45;
+  --color-rescheduled: #9a5b00;
+  --color-declined: #b42318;
+  --color-unreachable: #6f6c64;
+  --color-attention: #b4530a;
+
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-text);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: var(--color-bg);
+  --color-secondary: var(--color-surface-card);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-surface-card);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-destructive: var(--color-declined);
+  --color-destructive-foreground: var(--color-bg);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line);
+  --color-ring: var(--color-accent);
+}
+
+/*
+  The landing page's ground: brighter and cooler than the app's.
+
+  The app is warm paper because it is a document you work in for an hour at a
+  time. The front door is a poster, and it wants white with a faint blue in the
+  greys — which is what makes the soft tinted bands and the product sheet read
+  as clean rather than as aged paper.
+*/
+[data-ground="bright"] {
+  color-scheme: light;
+
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  /* The tinted bands a section sits on. */
+  --color-surface-soft: #f6f7fb;
+  --color-surface-card: #eef0f8;
+  --color-line: #ecedf4;
+  --color-line-strong: #dcdee8;
+  --color-text: #12131a;
+  --color-text-muted: #6b6f80;
+  /* Buttons stay ink. The page gets its colour from the tint, not the controls. */
+  --color-accent: #12131a;
+  --color-accent-active: #2a2c38;
+  --color-live: #2445e0;
+
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: var(--color-bg);
+  --color-secondary: var(--color-surface-card);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-surface-card);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line);
+  --color-ring: var(--color-accent);
+}
+
+[data-ground="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #141311;
+  --color-surface: #141311;
+  --color-surface-soft: #1c1a18;
+  --color-surface-card: #24221f;
+  --color-line: rgb(255 255 255 / 0.12);
+  --color-line-strong: rgb(255 255 255 / 0.2);
+  --color-text: #fafaf7;
+  --color-text-muted: #a8a49b;
+  /* On ink, the primary button is paper with ink text — flat, no gradient. */
+  --color-accent: #fafaf7;
+  --color-accent-active: #e6e4dd;
+  --color-live: #5b7cff;
+
+  --color-confirmed: #5cc08d;
+  --color-rescheduled: #e0a93c;
+  --color-declined: #f2776a;
+  --color-unreachable: #a8a49b;
+  --color-attention: #f0954a;
+
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-text);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: #141311;
+  --color-secondary: var(--color-surface-card);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-surface-card);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-destructive: var(--color-declined);
+  --color-destructive-foreground: #141311;
+  --color-border: var(--color-line);
+  --color-input: var(--color-line);
+  --color-ring: var(--color-accent);
+}
+
+/*
+  Respect prefers-reduced-motion. Transitions collapse to instant rather
+  than being removed, so state changes still land — they just don't animate.
+  `animation-delay` has to be reset too: without it a staggered entrance still
+  holds the page blank for its full stagger, it just does not animate at the
+  end of the wait.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+  Printing a Call is a real thing an owner does — a record of what was agreed.
+  Drop the chrome, keep the words, and never break a transcript turn across
+  two pages.
+*/
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  nav,
+  aside,
+  audio,
+  button,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  details {
+    display: none;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 11px;
+  }
+
+  li,
+  tr,
+  [data-print="keep"] {
+    break-inside: avoid;
+  }
+}
+
+/*
+  Clerk, flattened.
+
+  Clerk renders sign-in, sign-up, the avatar popover and the "Manage account"
+  modal from its own stylesheet, outside Tailwind's tree. Almost all of it is
+  themed from `lib/clerk-theme.ts`, which is where anything expressible as a
+  token belongs — but Clerk paints the raised look of its controls with
+  `box-shadow` rules that beat the inline styles the theme produces. Four
+  layered shadows on one button, including an inset highlight.
+
+  Separation in this system is a 1px rule and the only shadow allowed is on a
+  surface that floats over the page. So these four rules exist, and they need
+  `!important` for the reason above. They are the exception, not a second place
+  to style Clerk: put everything else in the theme file.
+*/
+.cl-formButtonPrimary,
+.cl-socialButtonsBlockButton,
+.cl-formFieldInput,
+.cl-otpCodeFieldInput {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+.cl-socialButtonsBlockButton,
+.cl-formFieldInput,
+.cl-otpCodeFieldInput {
+  border: 1px solid var(--color-line) !important;
+}
+
+/* Clerk's own footer strip. The page already has a ground. */
+.cl-footer,
+.cl-footerAction {
+  background: transparent !important;
+}

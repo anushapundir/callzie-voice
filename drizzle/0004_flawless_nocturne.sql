@@ -1,0 +1,13 @@
+-- Retell's `transcript_object`, one entry per turn, so the Call detail screen
+-- can stamp each turn with the moment it was spoken (issue #16).
+--
+-- Nullable, and permanently so. It rides on `call_analyzed` while the plain
+-- `transcript` column rides on `call_ended`, so every Call has a window in which
+-- this is null and the text column is the only transcript there is.
+--
+-- drizzle-kit also wanted to add `tool_invocations.latency_ms` here. That column
+-- already exists: 0003 is hand-written and, following 0001's precedent, is not
+-- in the meta snapshot, so generate could not see it. Its statement is removed
+-- rather than kept, because a fresh migrate runs 0003 first and the second ADD
+-- would fail. 0004's snapshot does record the column, so this does not recur.
+ALTER TABLE "calls" ADD COLUMN "transcript_turns" jsonb;

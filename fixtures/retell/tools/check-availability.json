@@ -1,0 +1,11 @@
+{
+  "name": "check_availability",
+  "call": {
+    "call_id": "CALL_ID_PLACEHOLDER",
+    "agent_id": "agent_fixture",
+    "call_type": "web_call",
+    "call_status": "ongoing",
+    "transcript": "Agent: Hi Priya, this is Maya calling from Tool Test Salon about your haircut on Monday at 9am. Does that still work?\nUser: Sorry, no, something's come up."
+  },
+  "args": { "preferred_time": "Thursday afternoon" }
+}

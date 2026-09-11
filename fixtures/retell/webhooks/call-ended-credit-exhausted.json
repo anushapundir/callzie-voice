@@ -1,0 +1,20 @@
+{
+  "event": "call_ended",
+  "call": {
+    "call_type": "web_call",
+    "call_id": "CALL_ID_PLACEHOLDER",
+    "agent_id": "agent_maya_salon",
+    "call_status": "error",
+    "metadata": {
+      "call_id": "CALLZIE_CALL_ID_PLACEHOLDER",
+      "appointment_id": "APPOINTMENT_ID_PLACEHOLDER"
+    },
+    "start_timestamp": 1787216400000,
+    "end_timestamp": 1787216401000,
+    "duration_ms": 0,
+    "disconnection_reason": "no_valid_payment",
+    "transcript": "",
+    "recording_url": null,
+    "opt_out_sensitive_data_storage": false
+  }
+}

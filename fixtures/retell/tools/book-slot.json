@@ -1,0 +1,11 @@
+{
+  "name": "book_slot",
+  "call": {
+    "call_id": "CALL_ID_PLACEHOLDER",
+    "agent_id": "agent_fixture",
+    "call_type": "web_call",
+    "call_status": "ongoing",
+    "transcript": "Agent: I have 10am on Monday. Does that work?\nUser: Yes, that's perfect."
+  },
+  "args": { "slot_start": "SLOT_START_PLACEHOLDER" }
+}

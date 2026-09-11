@@ -1,0 +1,87 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# next.js
+.next/
+out/
+build/
+next-env.d.ts
+
+# production
+dist/
+
+# testing
+coverage/
+*.lcov
+
+# env — never commit secrets (SPEC.md §3.1)
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# NOTE: drizzle migrations are checked in on purpose (SPEC.md §2) — do not ignore them.
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editors / os
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# agent scratch
+.scratch/
+
+# local test Postgres cluster (embedded-postgres) — created by vitest.globalSetup.ts
+.pgdata/
+
+# local tooling binaries (Cloud SQL Auth Proxy) — downloaded, not vendored
+bin/
+
+# clerk configuration (can include secrets)
+/.clerk/
+qa/
+
+# Private browser/session artifacts and local security reports
+.playwright-mcp/
+playwright-report/
+test-results/
+*.har
+*-secrets.json
+*-privacy-report.json
+
+# Local credentials, keys and database exports
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+credentials.json
+service-account*.json
+
+# Local Python tooling cache
+__pycache__/
+*.pyc

@@ -1,0 +1,51 @@
+# Builds the Dockerfile with the build args Next.js needs.
+#
+# `gcloud run deploy --source .` cannot pass --build-arg, and Next inlines
+# NEXT_PUBLIC_* at build time (see Dockerfile), so the image must be built here
+# and deployed by tag rather than from source.
+#
+#   gcloud builds submit --config cloudbuild.yaml \
+#     --substitutions=_IMAGE=<image>,_CLERK_PUBLISHABLE_KEY=<pk_...>
+#
+# Credentials for third-party services are deliberately NOT build args — they
+# arrive at runtime from Secret Manager and never enter the image.
+#
+# NEXT_SERVER_ACTIONS_ENCRYPTION_KEY is the one exception, and a real one rather
+# than a lapse. It is not a credential for anything: it is a build input Next
+# salts every Server Action id with and then writes into its own build output,
+# so it is inside the image by construction and no configuration avoids that.
+# It still comes from Secret Manager, just here rather than at deploy — and as a
+# secretEnv rather than a substitution, because substitutions are recorded in
+# the build history. See docs/adr/0008-server-actions-key-is-a-build-input.md.
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    secretEnv:
+      - NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+    args:
+      - -c
+      # $$VAR is what the step's own shell expands. A single $ would be
+      # substituted by Cloud Build before the step runs, which would put the key
+      # back into the build record this indirection exists to keep it out of.
+      - |
+        docker build \
+          --build-arg=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${_CLERK_PUBLISHABLE_KEY} \
+          --build-arg=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=$$NEXT_SERVER_ACTIONS_ENCRYPTION_KEY \
+          --tag=${_IMAGE} \
+          .
+
+images:
+  - ${_IMAGE}
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/callzie-server-actions-encryption-key/versions/latest
+      env: NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+
+substitutions:
+  _IMAGE: ""
+  _CLERK_PUBLISHABLE_KEY: ""

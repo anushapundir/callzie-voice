@@ -1,0 +1,9 @@
+{
+  "event": "sms_inbound",
+  "event_timestamp": 1780012672105,
+  "sms_inbound": {
+    "from_number": "FROM_NUMBER_PLACEHOLDER",
+    "to_number": "TO_NUMBER_PLACEHOLDER",
+    "message": "hi, are you open tomorrow?"
+  }
+}

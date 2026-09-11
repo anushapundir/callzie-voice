@@ -1,0 +1,8 @@
+Agent: Hi, is this Priya? This is Maya calling from Tool Test Salon about your haircut.
+User: Hi, yes.
+Agent: I'm calling to confirm your appointment on Thursday the twentieth of August at 2:30 PM.
+User: Ah — I can't do Thursday any more, something's come up at work. Could I do Friday morning instead?
+Agent: Let me have a look at Friday for you.
+User: Anything before lunch would be great.
+Agent: I'm sorry, I'm having trouble pulling up the calendar. Someone will call you back to sort out Friday.
+User: No problem, thanks.

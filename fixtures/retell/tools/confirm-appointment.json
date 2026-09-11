@@ -1,0 +1,11 @@
+{
+  "name": "confirm_appointment",
+  "call": {
+    "call_id": "CALL_ID_PLACEHOLDER",
+    "agent_id": "agent_fixture",
+    "call_type": "web_call",
+    "call_status": "ongoing",
+    "transcript": "Agent: Does Monday at 9am still work for you?\nUser: Yes, that's fine."
+  },
+  "args": {}
+}

@@ -1,0 +1,27 @@
+name: Repository privacy
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  privacy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install checksum-verified secret scanner
+        run: python3 scripts/install-gitleaks.py
+      - name: Test the privacy gate
+        run: python3 scripts/test-repository-privacy.py
+      - name: Check committed content
+        run: python3 scripts/check-repository-privacy.py --revision HEAD
+      - name: Scan Git history for secrets
+        run: python3 scripts/check-repository-privacy.py --history

@@ -1,0 +1,7 @@
+title = "Callzie secret scanning"
+
+[extend]
+useDefault = true
+
+# Add provider-specific formats here as needed. Do not broadly allowlist tests,
+# fixtures, Markdown, or .env.example: those files can leak real credentials too.

@@ -1,0 +1,19 @@
+{
+  "event": "call_started",
+  "call": {
+    "call_type": "web_call",
+    "call_id": "CALL_ID_PLACEHOLDER",
+    "agent_id": "agent_maya_salon",
+    "call_status": "ongoing",
+    "metadata": {
+      "call_id": "CALLZIE_CALL_ID_PLACEHOLDER",
+      "appointment_id": "APPOINTMENT_ID_PLACEHOLDER"
+    },
+    "retell_llm_dynamic_variables": {
+      "name": "Priya Sharma",
+      "service": "Haircut",
+      "time": "Thursday at 9 in the morning"
+    },
+    "start_timestamp": 1787216400000
+  }
+}

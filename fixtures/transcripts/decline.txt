@@ -1,0 +1,6 @@
+Agent: Hi, is this Priya? This is Maya calling from Tool Test Salon about your haircut.
+User: Yes.
+Agent: I'm calling to confirm your appointment on Thursday the twentieth of August at 2:30 PM.
+User: Actually, no. I don't want it any more. I've moved out of the area.
+Agent: I'm sorry to hear that. I'll take that off the books.
+User: Thanks. Don't call again please.
